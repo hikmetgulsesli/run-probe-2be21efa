@@ -65,18 +65,21 @@ export type RunProbeShellAction =
   | { type: "SET_LAST_ERROR"; message: string | null }
   | { type: "RESET_PREFERENCES"; payload: PersistedSaveResult };
 
-const buildInitialState = (loadResult: PersistedLoadResult): RunProbeShellState => ({
+const buildInitialState = (
+  loadResult: PersistedLoadResult,
+  initialised: boolean = true,
+): RunProbeShellState => ({
   preferences: loadResult.preferences,
   records: runProbeFixture,
   storageStatus: loadResult.status,
   lastError: loadResult.status.state === "corrupted" ? loadResult.status.reason : null,
-  initialised: true,
+  initialised,
 });
 
 function reducer(state: RunProbeShellState, action: RunProbeShellAction): RunProbeShellState {
   switch (action.type) {
     case "BOOTSTRAP":
-      return buildInitialState(action.payload);
+      return buildInitialState(action.payload, true);
     case "SET_ACTIVE_SURFACE":
       return {
         ...state,
@@ -161,11 +164,18 @@ export function RunProbeShellProvider({
   children,
   storage,
 }: RunProbeShellProviderProps) {
-  const [state, dispatch] = useReducer(reducer, EMPTY_LOAD, () =>
-    buildInitialState(loadRunProbePreferences(storage, defaultRunProbePreferences())),
+  const [state, dispatch] = useReducer(
+    reducer,
+    EMPTY_LOAD,
+    () => buildInitialState({ preferences: defaultRunProbePreferences(), status: { state: "idle", reason: "", recoverable: true } }, false),
   );
   const stateRef = useRef(state);
   stateRef.current = state;
+
+  useEffect(() => {
+    const loaded = loadRunProbePreferences(storage, defaultRunProbePreferences());
+    dispatch({ type: "BOOTSTRAP", payload: loaded });
+  }, [storage]);
 
   const persist = useCallback(
     (next: RunProbePreferences) => {
@@ -295,6 +305,21 @@ export function RunProbeShellProvider({
       get: () => stateRef.current.initialised,
     });
     (window as unknown as Record<string, unknown>).app = app;
+    return () => {
+      const currentApp = (window as unknown as { app?: Record<string, unknown> }).app;
+      if (currentApp) {
+        delete currentApp.activeSurface;
+        delete currentApp.activePanel;
+        delete currentApp.selectedRecord;
+        delete currentApp.counts;
+        delete currentApp.storageStatus;
+        delete currentApp.lastError;
+        delete currentApp.initialised;
+        if (Object.keys(currentApp).length === 0) {
+          delete (window as unknown as Record<string, unknown>).app;
+        }
+      }
+    };
   }, []);
 
   useEffect(() => {
@@ -306,6 +331,18 @@ export function RunProbeShellProvider({
     app.selectRecord = (recordId: string | null) => selectRecord(recordId);
     app.resetPreferences = () => resetPreferences();
     w.app = app;
+    return () => {
+      const currentApp = (window as unknown as { app?: Record<string, unknown> }).app;
+      if (currentApp) {
+        delete currentApp.setActiveSurface;
+        delete currentApp.setActivePanel;
+        delete currentApp.selectRecord;
+        delete currentApp.resetPreferences;
+        if (Object.keys(currentApp).length === 0) {
+          delete (window as unknown as Record<string, unknown>).app;
+        }
+      }
+    };
   }, [setActiveSurface, setActivePanel, selectRecord, resetPreferences]);
 
   const value = useMemo<RunProbeShellApi>(

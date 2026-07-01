@@ -40,7 +40,7 @@ export function readRunProbeApp(
     counts: { ...api.counts },
     storageStatus: { ...api.storageStatus },
     lastError: api.lastError,
-    initialised: true,
+    initialised: api.initialised,
     setActiveSurface: api.setActiveSurface,
     setActivePanel: api.setActivePanel,
     selectRecord: api.selectRecord,

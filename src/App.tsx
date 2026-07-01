@@ -11,30 +11,30 @@ export default function App() {
 }
 
 function AppShell() {
-  const shell = useRunProbeShell();
-  const activeSurface = shell.state.preferences.activeSurfaceId;
+  const { setActivePanel, selectRecord, state } = useRunProbeShell();
+  const { activeSurfaceId, selectedRecordId } = state.preferences;
+  const firstRecordId = state.records[0]?.id ?? null;
 
   const handleRefreshAction = useCallback(() => {
-    shell.selectRecord(null);
-  }, [shell]);
+    selectRecord(null);
+  }, [selectRecord]);
 
   const handleManualRefreshAction = useCallback(() => {
-    const current = shell.state.preferences.selectedRecordId;
-    const next = current ?? shell.state.records[0]?.id ?? null;
-    shell.selectRecord(next);
-  }, [shell]);
+    const next = selectedRecordId ?? firstRecordId;
+    selectRecord(next);
+  }, [selectRecord, selectedRecordId, firstRecordId]);
 
   const handleSettingsAction = useCallback(() => {
-    shell.setActivePanel("settings");
-  }, [shell]);
+    setActivePanel("settings");
+  }, [setActivePanel]);
 
   const handleDocumentationLink = useCallback(() => {
-    shell.setActivePanel("documentation");
-  }, [shell]);
+    setActivePanel("documentation");
+  }, [setActivePanel]);
 
   const handlePrivacyLink = useCallback(() => {
-    shell.setActivePanel("privacy");
-  }, [shell]);
+    setActivePanel("privacy");
+  }, [setActivePanel]);
 
   const screenActions = useMemo(
     () => ({
@@ -57,7 +57,7 @@ function AppShell() {
     <div
       data-setfarm-root="run-probe-shell"
       data-testid="setfarm-app-root"
-      data-active-surface={activeSurface}
+      data-active-surface={activeSurfaceId}
       className="relative min-h-screen w-full overflow-hidden bg-slate-50 text-slate-950"
     >
       <StatusUtilityRunProbe actions={screenActions} />
