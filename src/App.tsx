@@ -5,6 +5,8 @@ import {
   useRunProbeShell,
   type RunProbeShellState,
 } from "./features/run-probe/run-probe.store";
+import { actRefreshStatus } from "./features/surf-status-utility/act_refresh_status";
+import { actToggleStatus } from "./features/surf-status-utility/act_toggle_status";
 
 export default function App() {
   return (
@@ -23,28 +25,40 @@ function AppShell() {
     setAutoRefresh,
     setIntervalSeconds,
     setActivePanel,
+    markRefreshed,
   } = useRunProbeShell();
   const activeSurfaceId = state.preferences.activeSurfaceId;
   const activePanel = state.preferences.activePanel;
   const lastError = state.lastError;
   const lastRefreshedAt = state.preferences.lastRefreshedAt;
   const refreshTick = state.refreshTick;
+  const autoRefresh = state.preferences.autoRefresh;
 
   const stateRef = useRef<RunProbeShellState>(state);
   stateRef.current = state;
 
   const handleRefreshAction = useCallback(() => {
-    selectRecord(null);
-  }, [selectRecord]);
+    const currentSelected = stateRef.current.preferences.selectedRecordId;
+    const fallback = stateRef.current.records[0]?.id ?? null;
+    actRefreshStatus(currentSelected, fallback, {
+      markRefreshed: () => markRefreshed(),
+      selectRecord: (id) => selectRecord(id),
+    });
+  }, [markRefreshed, selectRecord]);
 
   const handleManualRefreshAction = useCallback(() => {
     const current = stateRef.current.preferences.selectedRecordId;
     const fallback = stateRef.current.records[0]?.id ?? null;
-    selectRecord(current ?? fallback);
-  }, [selectRecord]);
+    actRefreshStatus(current, fallback, {
+      markRefreshed: () => markRefreshed(),
+      selectRecord: (id) => selectRecord(id),
+    });
+  }, [markRefreshed, selectRecord]);
 
   const handleSettingsAction = useCallback(() => {
-    setAutoRefresh(!stateRef.current.preferences.autoRefresh);
+    actToggleStatus(stateRef.current.preferences.autoRefresh, {
+      setAutoRefresh: (enabled) => setAutoRefresh(enabled),
+    });
     setActivePanel("settings");
   }, [setAutoRefresh, setActivePanel]);
 
@@ -95,7 +109,11 @@ function AppShell() {
       data-refresh-tick={refreshTick}
       className="relative min-h-screen w-full overflow-hidden bg-slate-50 text-slate-950"
     >
-      <StatusUtilityRunProbe actions={screenActions} />
+      <StatusUtilityRunProbe
+        actions={screenActions}
+        lastRefreshedAt={lastRefreshedAt}
+        autoRefresh={autoRefresh}
+      />
     </div>
   );
 }
