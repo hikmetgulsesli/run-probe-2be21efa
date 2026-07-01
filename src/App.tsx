@@ -21,6 +21,8 @@ function AppShell() {
   const activeSurfaceId = state.preferences.activeSurfaceId;
   const activePanel = state.preferences.activePanel;
   const lastError = state.lastError;
+  const lastRefreshedAt = state.preferences.lastRefreshedAt;
+  const refreshTick = state.refreshTick;
   const hasRecords = state.records.length > 0;
 
   const handleRefreshAction = useCallback(() => {
@@ -74,6 +76,8 @@ function AppShell() {
       data-active-surface={activeSurfaceId}
       data-active-panel={activePanel}
       data-last-error={lastError ?? ""}
+      data-last-refreshed-at={lastRefreshedAt ?? ""}
+      data-refresh-tick={refreshTick}
       className="relative min-h-screen w-full overflow-hidden bg-slate-50 text-slate-950"
     >
       <StatusUtilityRunProbe actions={screenActions} />

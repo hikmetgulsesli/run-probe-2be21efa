@@ -96,6 +96,7 @@ export function defaultRunProbePreferences(): RunProbePreferences {
     selectedRecordId: null,
     autoRefresh: true,
     intervalSeconds: 60,
+    lastRefreshedAt: null,
   };
 }
 
@@ -118,6 +119,11 @@ function isValidPreferences(value: unknown): value is Partial<RunProbePreference
   }
   if ("intervalSeconds" in candidate && typeof candidate.intervalSeconds !== "number") {
     return false;
+  }
+  if ("lastRefreshedAt" in candidate) {
+    if (candidate.lastRefreshedAt !== null && typeof candidate.lastRefreshedAt !== "number") {
+      return false;
+    }
   }
   return true;
 }

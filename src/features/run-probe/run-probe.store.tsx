@@ -44,6 +44,7 @@ export interface RunProbePreferences {
   selectedRecordId: string | null;
   autoRefresh: boolean;
   intervalSeconds: number;
+  lastRefreshedAt: number | null;
 }
 
 export interface RunProbeShellState {
@@ -52,6 +53,7 @@ export interface RunProbeShellState {
   storageStatus: RunProbeStorageStatus;
   lastError: string | null;
   initialised: boolean;
+  refreshTick: number;
 }
 
 export type RunProbeShellAction =
@@ -63,7 +65,7 @@ export type RunProbeShellAction =
   | { type: "SET_INTERVAL_SECONDS"; seconds: number }
   | { type: "RECORD_STORAGE_STATUS"; status: RunProbeStorageStatus; saved: boolean }
   | { type: "SET_LAST_ERROR"; message: string | null }
-  | { type: "MARK_REFRESHED"; at: number }
+  | { type: "MARK_REFRESHED"; at: number; nextTick: number }
   | { type: "RESET_PREFERENCES"; payload: PersistedSaveResult };
 
 const buildInitialState = (
@@ -75,6 +77,7 @@ const buildInitialState = (
   storageStatus: loadResult.status,
   lastError: loadResult.status.state === "corrupted" ? loadResult.status.reason : null,
   initialised,
+  refreshTick: 0,
 });
 
 function reducer(state: RunProbeShellState, action: RunProbeShellAction): RunProbeShellState {
@@ -122,9 +125,11 @@ function reducer(state: RunProbeShellState, action: RunProbeShellAction): RunPro
       return {
         ...state,
         lastError: null,
+        refreshTick: action.nextTick,
         preferences: {
           ...state.preferences,
           activeSurfaceId: "SURF_STATUS_UTILITY",
+          lastRefreshedAt: action.at,
         },
       };
     case "RESET_PREFERENCES":
@@ -249,10 +254,12 @@ export function RunProbeShellProvider({
 
   const markRefreshed = useCallback(() => {
     const at = Date.now();
-    dispatch({ type: "MARK_REFRESHED", at });
+    const nextTick = stateRef.current.refreshTick + 1;
+    dispatch({ type: "MARK_REFRESHED", at, nextTick });
     persist({
       ...stateRef.current.preferences,
       activeSurfaceId: "SURF_STATUS_UTILITY",
+      lastRefreshedAt: at,
     });
   }, [persist]);
 
@@ -344,6 +351,14 @@ export function RunProbeShellProvider({
       configurable: true,
       get: () => stateRef.current.initialised,
     });
+    Object.defineProperty(app, "lastRefreshedAt", {
+      configurable: true,
+      get: () => stateRef.current.preferences.lastRefreshedAt,
+    });
+    Object.defineProperty(app, "refreshTick", {
+      configurable: true,
+      get: () => stateRef.current.refreshTick,
+    });
     (window as unknown as Record<string, unknown>).app = app;
     return () => {
       const currentApp = (window as unknown as { app?: Record<string, unknown> }).app;
@@ -355,6 +370,8 @@ export function RunProbeShellProvider({
         delete currentApp.storageStatus;
         delete currentApp.lastError;
         delete currentApp.initialised;
+        delete currentApp.lastRefreshedAt;
+        delete currentApp.refreshTick;
         if (Object.keys(currentApp).length === 0) {
           delete (window as unknown as Record<string, unknown>).app;
         }
