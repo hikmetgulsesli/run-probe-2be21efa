@@ -1,6 +1,10 @@
-import { useCallback, useMemo } from "react";
+import { useCallback, useMemo, useRef } from "react";
 import { StatusUtilityRunProbe } from "./screens";
-import { RunProbeShellProvider, useRunProbeShell } from "./features/run-probe/run-probe.store";
+import {
+  RunProbeShellProvider,
+  useRunProbeShell,
+  type RunProbeShellState,
+} from "./features/run-probe/run-probe.store";
 
 export default function App() {
   return (
@@ -20,33 +24,34 @@ function AppShell() {
     setIntervalSeconds,
     setActivePanel,
   } = useRunProbeShell();
-  const selectedRecordId = state.preferences.selectedRecordId;
-  const firstRecordId = state.records[0]?.id ?? null;
-  const autoRefresh = state.preferences.autoRefresh;
-  const intervalSeconds = state.preferences.intervalSeconds;
   const activeSurfaceId = state.preferences.activeSurfaceId;
   const activePanel = state.preferences.activePanel;
   const lastError = state.lastError;
   const lastRefreshedAt = state.preferences.lastRefreshedAt;
   const refreshTick = state.refreshTick;
 
+  const stateRef = useRef<RunProbeShellState>(state);
+  stateRef.current = state;
+
   const handleRefreshAction = useCallback(() => {
     selectRecord(null);
   }, [selectRecord]);
 
   const handleManualRefreshAction = useCallback(() => {
-    const next = selectedRecordId ?? firstRecordId;
-    selectRecord(next);
-  }, [selectedRecordId, firstRecordId, selectRecord]);
+    const current = stateRef.current.preferences.selectedRecordId;
+    const fallback = stateRef.current.records[0]?.id ?? null;
+    selectRecord(current ?? fallback);
+  }, [selectRecord]);
 
   const handleSettingsAction = useCallback(() => {
-    setAutoRefresh(!autoRefresh);
+    setAutoRefresh(!stateRef.current.preferences.autoRefresh);
     setActivePanel("settings");
-  }, [setAutoRefresh, setActivePanel, autoRefresh]);
+  }, [setAutoRefresh, setActivePanel]);
 
   const handleDocumentationLink = useCallback(() => {
+    const current = stateRef.current.preferences.intervalSeconds;
     const currentIndex = INTERVAL_OPTIONS_SECONDS.indexOf(
-      intervalSeconds as (typeof INTERVAL_OPTIONS_SECONDS)[number],
+      current as (typeof INTERVAL_OPTIONS_SECONDS)[number],
     );
     const nextValue =
       INTERVAL_OPTIONS_SECONDS[
@@ -54,13 +59,13 @@ function AppShell() {
       ];
     setIntervalSeconds(nextValue);
     setActivePanel("documentation");
-  }, [setIntervalSeconds, setActivePanel, intervalSeconds]);
+  }, [setIntervalSeconds, setActivePanel]);
 
   const handlePrivacyLink = useCallback(() => {
-    const nextRecord = state.records[0]?.id ?? null;
+    const nextRecord = stateRef.current.records[0]?.id ?? null;
     selectRecord(nextRecord);
     setActivePanel("privacy");
-  }, [selectRecord, setActivePanel, state.records]);
+  }, [selectRecord, setActivePanel]);
 
   const screenActions = useMemo(
     () => ({
