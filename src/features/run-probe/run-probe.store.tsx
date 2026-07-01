@@ -63,6 +63,7 @@ export type RunProbeShellAction =
   | { type: "SET_INTERVAL_SECONDS"; seconds: number }
   | { type: "RECORD_STORAGE_STATUS"; status: RunProbeStorageStatus; saved: boolean }
   | { type: "SET_LAST_ERROR"; message: string | null }
+  | { type: "MARK_REFRESHED"; at: number }
   | { type: "RESET_PREFERENCES"; payload: PersistedSaveResult };
 
 const buildInitialState = (
@@ -117,6 +118,15 @@ function reducer(state: RunProbeShellState, action: RunProbeShellAction): RunPro
       };
     case "SET_LAST_ERROR":
       return { ...state, lastError: action.message };
+    case "MARK_REFRESHED":
+      return {
+        ...state,
+        lastError: null,
+        preferences: {
+          ...state.preferences,
+          activeSurfaceId: "SURF_STATUS_UTILITY",
+        },
+      };
     case "RESET_PREFERENCES":
       return {
         ...state,
@@ -145,10 +155,13 @@ export interface RunProbeShellApi {
   setActiveSurface: (surfaceId: string) => void;
   setActivePanel: (panel: string) => void;
   selectRecord: (recordId: string | null) => void;
+  cycleSelectedRecord: () => void;
+  markRefreshed: () => void;
   setAutoRefresh: (enabled: boolean) => void;
   setIntervalSeconds: (seconds: number) => void;
   resetPreferences: () => void;
   recordById: (recordId: string | null) => RunProbeRecord | null;
+  records: RunProbeRecord[];
   counts: { total: number; ready: number; paused: number; error: number };
   lastErrorMessage: () => string | null;
 }
@@ -215,6 +228,33 @@ export function RunProbeShellProvider({
     },
     [persist],
   );
+
+  const cycleSelectedRecord = useCallback(() => {
+    const records = stateRef.current.records;
+    const current = stateRef.current.preferences.selectedRecordId;
+    if (records.length === 0) {
+      const next = current === null ? null : null;
+      if (next !== current) {
+        dispatch({ type: "SELECT_RECORD", recordId: next });
+        persist({ ...stateRef.current.preferences, selectedRecordId: next });
+      }
+      return;
+    }
+    const currentIndex = current ? records.findIndex((r) => r.id === current) : -1;
+    const nextIndex = (currentIndex + 1) % records.length;
+    const nextId = records[nextIndex].id;
+    dispatch({ type: "SELECT_RECORD", recordId: nextId });
+    persist({ ...stateRef.current.preferences, selectedRecordId: nextId });
+  }, [persist]);
+
+  const markRefreshed = useCallback(() => {
+    const at = Date.now();
+    dispatch({ type: "MARK_REFRESHED", at });
+    persist({
+      ...stateRef.current.preferences,
+      activeSurfaceId: "SURF_STATUS_UTILITY",
+    });
+  }, [persist]);
 
   const setAutoRefresh = useCallback(
     (enabled: boolean) => {
@@ -351,10 +391,13 @@ export function RunProbeShellProvider({
       setActiveSurface,
       setActivePanel,
       selectRecord,
+      cycleSelectedRecord,
+      markRefreshed,
       setAutoRefresh,
       setIntervalSeconds,
       resetPreferences,
       recordById,
+      records: state.records,
       counts,
       lastErrorMessage,
     }),
@@ -363,6 +406,8 @@ export function RunProbeShellProvider({
       setActiveSurface,
       setActivePanel,
       selectRecord,
+      cycleSelectedRecord,
+      markRefreshed,
       setAutoRefresh,
       setIntervalSeconds,
       resetPreferences,

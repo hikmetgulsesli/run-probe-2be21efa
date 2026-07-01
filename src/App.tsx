@@ -11,30 +11,44 @@ export default function App() {
 }
 
 function AppShell() {
-  const { setActivePanel, selectRecord, state } = useRunProbeShell();
-  const { activeSurfaceId, selectedRecordId } = state.preferences;
-  const firstRecordId = state.records[0]?.id ?? null;
+  const {
+    setActiveSurface,
+    setActivePanel,
+    cycleSelectedRecord,
+    markRefreshed,
+    state,
+  } = useRunProbeShell();
+  const activeSurfaceId = state.preferences.activeSurfaceId;
+  const activePanel = state.preferences.activePanel;
+  const lastError = state.lastError;
+  const hasRecords = state.records.length > 0;
 
   const handleRefreshAction = useCallback(() => {
-    selectRecord(null);
-  }, [selectRecord]);
+    markRefreshed();
+  }, [markRefreshed]);
 
   const handleManualRefreshAction = useCallback(() => {
-    const next = selectedRecordId ?? firstRecordId;
-    selectRecord(next);
-  }, [selectRecord, selectedRecordId, firstRecordId]);
+    if (!hasRecords) {
+      markRefreshed();
+      return;
+    }
+    cycleSelectedRecord();
+  }, [cycleSelectedRecord, markRefreshed, hasRecords]);
 
   const handleSettingsAction = useCallback(() => {
+    setActiveSurface("SURF_SETTINGS");
     setActivePanel("settings");
-  }, [setActivePanel]);
+  }, [setActiveSurface, setActivePanel]);
 
   const handleDocumentationLink = useCallback(() => {
+    setActiveSurface("SURF_DOCUMENTATION");
     setActivePanel("documentation");
-  }, [setActivePanel]);
+  }, [setActiveSurface, setActivePanel]);
 
   const handlePrivacyLink = useCallback(() => {
+    setActiveSurface("SURF_PRIVACY");
     setActivePanel("privacy");
-  }, [setActivePanel]);
+  }, [setActiveSurface, setActivePanel]);
 
   const screenActions = useMemo(
     () => ({
@@ -58,6 +72,8 @@ function AppShell() {
       data-setfarm-root="run-probe-shell"
       data-testid="setfarm-app-root"
       data-active-surface={activeSurfaceId}
+      data-active-panel={activePanel}
+      data-last-error={lastError ?? ""}
       className="relative min-h-screen w-full overflow-hidden bg-slate-50 text-slate-950"
     >
       <StatusUtilityRunProbe actions={screenActions} />
