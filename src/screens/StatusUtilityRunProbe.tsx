@@ -7,17 +7,11 @@
 // 3. Wire interactive controls through the typed actions prop
 // 4. Replace placeholder data with props/state
 
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { CircleAlert, Cpu, Database, RefreshCw, Router, Settings, Terminal } from "lucide-react";
 
 
-export type StatusUtilityRunProbeActionId =
-  | "refresh-1"
-  | "settings-2"
-  | "manual-refresh-3"
-  | "documentation-1"
-  | "privacy-2"
-  | "system-state-toggle";
+export type StatusUtilityRunProbeActionId = "refresh-1" | "settings-2" | "manual-refresh-3" | "documentation-1" | "privacy-2";
 
 export interface StatusUtilityRunProbeProps {
   actions?: Partial<Record<StatusUtilityRunProbeActionId, () => void>>;
@@ -38,30 +32,19 @@ function formatTimestamp(at: number | null | undefined): string {
   return `${month} ${day}, ${hh}:${mm}:${ss}`;
 }
 
-export function StatusUtilityRunProbe({ actions, lastRefreshedAt, autoRefresh }: StatusUtilityRunProbeProps) {
-  const resolvedAutoRefresh = autoRefresh ?? true;
-  const [systemEnabled, setSystemEnabled] = useState<boolean>(resolvedAutoRefresh);
-  const [footerClickCount, setFooterClickCount] = useState<number>(0);
-  const [footerPulse, setFooterPulse] = useState<number>(0);
+export function StatusUtilityRunProbe({ actions, lastRefreshedAt, autoRefresh = true }: StatusUtilityRunProbeProps) {
+  const [systemEnabled, setSystemEnabled] = useState<boolean>(autoRefresh);
 
   useEffect(() => {
-    setSystemEnabled(resolvedAutoRefresh);
-  }, [resolvedAutoRefresh]);
+    setSystemEnabled(autoRefresh);
+  }, [autoRefresh]);
 
-  const handleSystemToggle = useCallback(() => {
-    setSystemEnabled((prev) => {
-      const next = !prev;
-      actions?.["system-state-toggle"]?.();
-      return next;
-    });
-  }, [actions]);
+  const handleToggle = () => {
+    const next = !systemEnabled;
+    setSystemEnabled(next);
+    actions?.["manual-refresh-3"]?.();
+  };
 
-  const handleFooterClick = useCallback(() => {
-    setFooterClickCount((c) => c + 1);
-    setFooterPulse((p) => p + 1);
-  }, []);
-
-  const lastCheckedLabel = formatTimestamp(lastRefreshedAt);
   return (
     <>
       {/* TopAppBar */}
@@ -95,7 +78,7 @@ export function StatusUtilityRunProbe({ actions, lastRefreshedAt, autoRefresh }:
       <div className="flex items-center gap-sm">
       <span className="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">State</span>
       <label className="relative inline-flex items-center cursor-pointer">
-      <input checked={systemEnabled} onChange={handleSystemToggle} className="sr-only peer" id="system-state-toggle" type="checkbox" data-action-id="system-state-toggle" data-state={systemEnabled ? "ready" : "paused"} />
+      <input checked={systemEnabled} onChange={handleToggle} className="sr-only peer" id="system-state-toggle" type="checkbox" defaultValue="" />
       <div className="w-9 h-5 bg-outline-variant peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary"></div>
       </label>
       </div>
@@ -164,7 +147,7 @@ export function StatusUtilityRunProbe({ actions, lastRefreshedAt, autoRefresh }:
       <div className="p-md bg-surface-container-low border-t border-outline-variant flex items-center justify-between rounded-b">
       <div className="flex items-center gap-xs text-on-surface-variant">
       <RefreshCw className="text-[14px]" aria-hidden={true} focusable="false" />
-      <span className="font-body-sm text-body-sm text-[12px]" id="last-checked">Last checked: <span className="font-code-md text-[11px]" data-last-checked={lastCheckedLabel}>{lastCheckedLabel}</span></span>
+      <span className="font-body-sm text-body-sm text-[12px]" id="last-checked">Last checked: <span className="font-code-md text-[11px]">{formatTimestamp(lastRefreshedAt)}</span></span>
       </div>
       <button className="bg-primary text-on-primary font-label-md text-label-md px-4 py-2 rounded hover:bg-primary/90 transition-colors flex items-center gap-sm active:scale-95 transform duration-100" id="manual-refresh-btn" type="button" data-action-id="manual-refresh-3" onClick={actions?.["manual-refresh-3"]}>
       <RefreshCw className="text-[16px]" aria-hidden={true} focusable="false" />
@@ -177,25 +160,8 @@ export function StatusUtilityRunProbe({ actions, lastRefreshedAt, autoRefresh }:
       <footer className="bg-surface-container-lowest dark:bg-surface-container-lowest border-t border-outline-variant dark:border-outline full-width bottom-0 mt-auto">
       <div className="flex flex-col md:flex-row justify-between items-center py-sm px-gutter w-full max-w-7xl mx-auto">
       <div className="flex items-center gap-sm">
-      <button
-        type="button"
-        id="footer-brand-button"
-        data-action-id="footer-brand"
-        onClick={handleFooterClick}
-        aria-live="polite"
-        className="font-headline-md text-headline-md text-primary bg-transparent border-0 p-0 cursor-pointer"
-        style={{fontSize: "14px"}}
-      >
-        Run Probe
-      </button>
+      <span className="font-headline-md text-headline-md text-primary" style={{fontSize: "14px"}}>Run Probe</span>
       <span className="text-on-surface-variant dark:text-on-secondary-container font-body-sm text-body-sm text-[11px]">© 2024 Run Probe Utility</span>
-      <span
-        id="footer-brand-feedback"
-        data-footer-clicks={footerClickCount}
-        data-footer-pulse={footerPulse}
-        aria-hidden="true"
-        className="sr-only"
-      />
       </div>
       <div className="flex gap-md mt-2 md:mt-0">
       <a className="text-on-surface-variant dark:text-on-secondary-container font-label-md text-label-md hover:text-primary dark:hover:text-primary-fixed transition-colors duration-200" href="#" data-action-id="documentation-1" onClick={(event) => { event.preventDefault(); actions?.["documentation-1"]?.(); }}>Documentation</a>

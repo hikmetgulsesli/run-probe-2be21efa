@@ -5,8 +5,6 @@ import {
   useRunProbeShell,
   type RunProbeShellState,
 } from "./features/run-probe/run-probe.store";
-import { actRefreshStatus } from "./features/surf-status-utility/act_refresh_status";
-import { actToggleStatus } from "./features/surf-status-utility/act_toggle_status";
 
 export default function App() {
   return (
@@ -25,42 +23,28 @@ function AppShell() {
     setAutoRefresh,
     setIntervalSeconds,
     setActivePanel,
-    markRefreshed,
   } = useRunProbeShell();
   const activeSurfaceId = state.preferences.activeSurfaceId;
   const activePanel = state.preferences.activePanel;
   const lastError = state.lastError;
   const lastRefreshedAt = state.preferences.lastRefreshedAt;
   const refreshTick = state.refreshTick;
-  const autoRefresh = state.preferences.autoRefresh;
 
   const stateRef = useRef<RunProbeShellState>(state);
   stateRef.current = state;
 
   const handleRefreshAction = useCallback(() => {
-    const currentSelected = stateRef.current.preferences.selectedRecordId;
-    const fallback = stateRef.current.records[0]?.id ?? null;
-    actRefreshStatus(currentSelected, fallback, {
-      markRefreshed: () => markRefreshed(),
-      selectRecord: (id) => selectRecord(id),
-      currentRefreshTick: stateRef.current.refreshTick,
-    });
-  }, [markRefreshed, selectRecord]);
+    selectRecord(null);
+  }, [selectRecord]);
 
   const handleManualRefreshAction = useCallback(() => {
     const current = stateRef.current.preferences.selectedRecordId;
     const fallback = stateRef.current.records[0]?.id ?? null;
-    actRefreshStatus(current, fallback, {
-      markRefreshed: () => markRefreshed(),
-      selectRecord: (id) => selectRecord(id),
-      currentRefreshTick: stateRef.current.refreshTick,
-    });
-  }, [markRefreshed, selectRecord]);
+    selectRecord(current ?? fallback);
+  }, [selectRecord]);
 
   const handleSettingsAction = useCallback(() => {
-    actToggleStatus(stateRef.current.preferences.autoRefresh, {
-      setAutoRefresh: (enabled) => setAutoRefresh(enabled),
-    });
+    setAutoRefresh(!stateRef.current.preferences.autoRefresh);
     setActivePanel("settings");
   }, [setAutoRefresh, setActivePanel]);
 
@@ -83,12 +67,6 @@ function AppShell() {
     setActivePanel("privacy");
   }, [selectRecord, setActivePanel]);
 
-  const handleSystemStateToggleAction = useCallback(() => {
-    actToggleStatus(stateRef.current.preferences.autoRefresh, {
-      setAutoRefresh: (enabled) => setAutoRefresh(enabled),
-    });
-  }, [setAutoRefresh]);
-
   const screenActions = useMemo(
     () => ({
       "refresh-1": handleRefreshAction,
@@ -96,7 +74,6 @@ function AppShell() {
       "manual-refresh-3": handleManualRefreshAction,
       "documentation-1": handleDocumentationLink,
       "privacy-2": handlePrivacyLink,
-      "system-state-toggle": handleSystemStateToggleAction,
     }),
     [
       handleRefreshAction,
@@ -104,7 +81,6 @@ function AppShell() {
       handleManualRefreshAction,
       handleDocumentationLink,
       handlePrivacyLink,
-      handleSystemStateToggleAction,
     ],
   );
 
@@ -122,7 +98,7 @@ function AppShell() {
       <StatusUtilityRunProbe
         actions={screenActions}
         lastRefreshedAt={lastRefreshedAt}
-        autoRefresh={autoRefresh}
+        autoRefresh={state.preferences.autoRefresh}
       />
     </div>
   );
