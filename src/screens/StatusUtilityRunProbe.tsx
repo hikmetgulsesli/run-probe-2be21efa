@@ -41,8 +41,6 @@ function formatTimestamp(at: number | null | undefined): string {
 export function StatusUtilityRunProbe({ actions, lastRefreshedAt, autoRefresh }: StatusUtilityRunProbeProps) {
   const resolvedAutoRefresh = autoRefresh ?? true;
   const [systemEnabled, setSystemEnabled] = useState<boolean>(resolvedAutoRefresh);
-  const [footerClickCount, setFooterClickCount] = useState<number>(0);
-  const [footerPulse, setFooterPulse] = useState<number>(0);
 
   useEffect(() => {
     setSystemEnabled(resolvedAutoRefresh);
@@ -56,12 +54,6 @@ export function StatusUtilityRunProbe({ actions, lastRefreshedAt, autoRefresh }:
     });
   }, [actions]);
 
-  const handleFooterClick = useCallback(() => {
-    setFooterClickCount((c) => c + 1);
-    setFooterPulse((p) => p + 1);
-  }, []);
-
-  const lastCheckedLabel = formatTimestamp(lastRefreshedAt);
   return (
     <>
       {/* TopAppBar */}
@@ -164,7 +156,7 @@ export function StatusUtilityRunProbe({ actions, lastRefreshedAt, autoRefresh }:
       <div className="p-md bg-surface-container-low border-t border-outline-variant flex items-center justify-between rounded-b">
       <div className="flex items-center gap-xs text-on-surface-variant">
       <RefreshCw className="text-[14px]" aria-hidden={true} focusable="false" />
-      <span className="font-body-sm text-body-sm text-[12px]" id="last-checked">Last checked: <span className="font-code-md text-[11px]" data-last-checked={lastCheckedLabel}>{lastCheckedLabel}</span></span>
+      <span className="font-body-sm text-body-sm text-[12px]" id="last-checked">Last checked: <span className="font-code-md text-[11px]">{formatTimestamp(lastRefreshedAt)}</span></span>
       </div>
       <button className="bg-primary text-on-primary font-label-md text-label-md px-4 py-2 rounded hover:bg-primary/90 transition-colors flex items-center gap-sm active:scale-95 transform duration-100" id="manual-refresh-btn" type="button" data-action-id="manual-refresh-3" onClick={actions?.["manual-refresh-3"]}>
       <RefreshCw className="text-[16px]" aria-hidden={true} focusable="false" />
@@ -177,25 +169,8 @@ export function StatusUtilityRunProbe({ actions, lastRefreshedAt, autoRefresh }:
       <footer className="bg-surface-container-lowest dark:bg-surface-container-lowest border-t border-outline-variant dark:border-outline full-width bottom-0 mt-auto">
       <div className="flex flex-col md:flex-row justify-between items-center py-sm px-gutter w-full max-w-7xl mx-auto">
       <div className="flex items-center gap-sm">
-      <button
-        type="button"
-        id="footer-brand-button"
-        data-action-id="footer-brand"
-        onClick={handleFooterClick}
-        aria-live="polite"
-        className="font-headline-md text-headline-md text-primary bg-transparent border-0 p-0 cursor-pointer"
-        style={{fontSize: "14px"}}
-      >
-        Run Probe
-      </button>
+      <span className="font-headline-md text-headline-md text-primary" style={{fontSize: "14px"}}>Run Probe</span>
       <span className="text-on-surface-variant dark:text-on-secondary-container font-body-sm text-body-sm text-[11px]">© 2024 Run Probe Utility</span>
-      <span
-        id="footer-brand-feedback"
-        data-footer-clicks={footerClickCount}
-        data-footer-pulse={footerPulse}
-        aria-hidden="true"
-        className="sr-only"
-      />
       </div>
       <div className="flex gap-md mt-2 md:mt-0">
       <a className="text-on-surface-variant dark:text-on-secondary-container font-label-md text-label-md hover:text-primary dark:hover:text-primary-fixed transition-colors duration-200" href="#" data-action-id="documentation-1" onClick={(event) => { event.preventDefault(); actions?.["documentation-1"]?.(); }}>Documentation</a>
