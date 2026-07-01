@@ -1,12 +1,9 @@
-import { useCallback, useMemo, useRef } from "react";
+import { useCallback, useMemo } from "react";
 import { StatusUtilityRunProbe } from "./screens";
 import {
   RunProbeShellProvider,
   useRunProbeShell,
-  type RunProbeShellState,
 } from "./features/run-probe/run-probe.store";
-import { actRefreshStatus } from "./features/surf-status-utility/act_refresh_status";
-import { actToggleStatus } from "./features/surf-status-utility/act_toggle_status";
 
 export default function App() {
   return (
@@ -25,7 +22,6 @@ function AppShell() {
     setAutoRefresh,
     setIntervalSeconds,
     setActivePanel,
-    markRefreshed,
   } = useRunProbeShell();
   const activeSurfaceId = state.preferences.activeSurfaceId;
   const activePanel = state.preferences.activePanel;
@@ -33,41 +29,26 @@ function AppShell() {
   const lastRefreshedAt = state.preferences.lastRefreshedAt;
   const refreshTick = state.refreshTick;
   const autoRefresh = state.preferences.autoRefresh;
-
-  const stateRef = useRef<RunProbeShellState>(state);
-  stateRef.current = state;
+  const selectedRecordId = state.preferences.selectedRecordId;
+  const intervalSeconds = state.preferences.intervalSeconds;
+  const firstRecordId = state.records[0]?.id ?? null;
 
   const handleRefreshAction = useCallback(() => {
-    const currentSelected = stateRef.current.preferences.selectedRecordId;
-    const fallback = stateRef.current.records[0]?.id ?? null;
-    actRefreshStatus(currentSelected, fallback, {
-      markRefreshed: () => markRefreshed(),
-      selectRecord: (id) => selectRecord(id),
-      currentRefreshTick: stateRef.current.refreshTick,
-    });
-  }, [markRefreshed, selectRecord]);
+    selectRecord(null);
+  }, [selectRecord]);
 
   const handleManualRefreshAction = useCallback(() => {
-    const current = stateRef.current.preferences.selectedRecordId;
-    const fallback = stateRef.current.records[0]?.id ?? null;
-    actRefreshStatus(current, fallback, {
-      markRefreshed: () => markRefreshed(),
-      selectRecord: (id) => selectRecord(id),
-      currentRefreshTick: stateRef.current.refreshTick,
-    });
-  }, [markRefreshed, selectRecord]);
+    selectRecord(selectedRecordId ?? firstRecordId);
+  }, [selectRecord, selectedRecordId, firstRecordId]);
 
   const handleSettingsAction = useCallback(() => {
-    actToggleStatus(stateRef.current.preferences.autoRefresh, {
-      setAutoRefresh: (enabled) => setAutoRefresh(enabled),
-    });
+    setAutoRefresh(!autoRefresh);
     setActivePanel("settings");
-  }, [setAutoRefresh, setActivePanel]);
+  }, [setAutoRefresh, setActivePanel, autoRefresh]);
 
   const handleDocumentationLink = useCallback(() => {
-    const current = stateRef.current.preferences.intervalSeconds;
     const currentIndex = INTERVAL_OPTIONS_SECONDS.indexOf(
-      current as (typeof INTERVAL_OPTIONS_SECONDS)[number],
+      intervalSeconds as (typeof INTERVAL_OPTIONS_SECONDS)[number],
     );
     const nextValue =
       INTERVAL_OPTIONS_SECONDS[
@@ -75,19 +56,12 @@ function AppShell() {
       ];
     setIntervalSeconds(nextValue);
     setActivePanel("documentation");
-  }, [setIntervalSeconds, setActivePanel]);
+  }, [setIntervalSeconds, setActivePanel, intervalSeconds]);
 
   const handlePrivacyLink = useCallback(() => {
-    const nextRecord = stateRef.current.records[0]?.id ?? null;
-    selectRecord(nextRecord);
+    selectRecord(firstRecordId);
     setActivePanel("privacy");
-  }, [selectRecord, setActivePanel]);
-
-  const handleSystemStateToggleAction = useCallback(() => {
-    actToggleStatus(stateRef.current.preferences.autoRefresh, {
-      setAutoRefresh: (enabled) => setAutoRefresh(enabled),
-    });
-  }, [setAutoRefresh]);
+  }, [selectRecord, setActivePanel, firstRecordId]);
 
   const screenActions = useMemo(
     () => ({
@@ -96,7 +70,6 @@ function AppShell() {
       "manual-refresh-3": handleManualRefreshAction,
       "documentation-1": handleDocumentationLink,
       "privacy-2": handlePrivacyLink,
-      "system-state-toggle": handleSystemStateToggleAction,
     }),
     [
       handleRefreshAction,
@@ -104,7 +77,6 @@ function AppShell() {
       handleManualRefreshAction,
       handleDocumentationLink,
       handlePrivacyLink,
-      handleSystemStateToggleAction,
     ],
   );
 
@@ -119,11 +91,7 @@ function AppShell() {
       data-refresh-tick={refreshTick}
       className="relative min-h-screen w-full overflow-hidden bg-slate-50 text-slate-950"
     >
-      <StatusUtilityRunProbe
-        actions={screenActions}
-        lastRefreshedAt={lastRefreshedAt}
-        autoRefresh={autoRefresh}
-      />
+      <StatusUtilityRunProbe actions={screenActions} />
     </div>
   );
 }
