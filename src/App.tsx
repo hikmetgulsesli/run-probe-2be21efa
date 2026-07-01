@@ -3,6 +3,7 @@ import { StatusUtilityRunProbe } from "./screens";
 import {
   RunProbeShellProvider,
   useRunProbeShell,
+  type RunProbeShellApi,
   type RunProbeShellState,
 } from "./features/run-probe/run-probe.store";
 import { actRefreshStatus } from "./features/surf-status-utility/act_refresh_status";
@@ -36,26 +37,30 @@ function AppShell() {
 
   const stateRef = useRef<RunProbeShellState>(state);
   stateRef.current = state;
+  const shellRef = useRef<Pick<RunProbeShellApi, "markRefreshed" | "selectRecord" | "setAutoRefresh">>({
+    markRefreshed,
+    selectRecord,
+    setAutoRefresh,
+  });
+  shellRef.current = { markRefreshed, selectRecord, setAutoRefresh };
 
   const handleRefreshAction = useCallback(() => {
-    const currentSelected = stateRef.current.preferences.selectedRecordId;
+    const current = stateRef.current.preferences.selectedRecordId;
     const fallback = stateRef.current.records[0]?.id ?? null;
-    actRefreshStatus(currentSelected, fallback, {
-      markRefreshed: () => markRefreshed(),
-      selectRecord: (id) => selectRecord(id),
+    actRefreshStatus(current, fallback, {
+      shell: shellRef.current,
       currentRefreshTick: stateRef.current.refreshTick,
     });
-  }, [markRefreshed, selectRecord]);
+  }, []);
 
   const handleManualRefreshAction = useCallback(() => {
     const current = stateRef.current.preferences.selectedRecordId;
     const fallback = stateRef.current.records[0]?.id ?? null;
     actRefreshStatus(current, fallback, {
-      markRefreshed: () => markRefreshed(),
-      selectRecord: (id) => selectRecord(id),
+      shell: shellRef.current,
       currentRefreshTick: stateRef.current.refreshTick,
     });
-  }, [markRefreshed, selectRecord]);
+  }, []);
 
   const handleSettingsAction = useCallback(() => {
     actToggleStatus(stateRef.current.preferences.autoRefresh, {
@@ -83,12 +88,6 @@ function AppShell() {
     setActivePanel("privacy");
   }, [selectRecord, setActivePanel]);
 
-  const handleSystemStateToggleAction = useCallback(() => {
-    actToggleStatus(stateRef.current.preferences.autoRefresh, {
-      setAutoRefresh: (enabled) => setAutoRefresh(enabled),
-    });
-  }, [setAutoRefresh]);
-
   const screenActions = useMemo(
     () => ({
       "refresh-1": handleRefreshAction,
@@ -96,7 +95,6 @@ function AppShell() {
       "manual-refresh-3": handleManualRefreshAction,
       "documentation-1": handleDocumentationLink,
       "privacy-2": handlePrivacyLink,
-      "system-state-toggle": handleSystemStateToggleAction,
     }),
     [
       handleRefreshAction,
@@ -104,7 +102,6 @@ function AppShell() {
       handleManualRefreshAction,
       handleDocumentationLink,
       handlePrivacyLink,
-      handleSystemStateToggleAction,
     ],
   );
 
