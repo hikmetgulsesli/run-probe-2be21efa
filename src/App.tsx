@@ -10,47 +10,57 @@ export default function App() {
   );
 }
 
+const INTERVAL_OPTIONS_SECONDS = [30, 60, 120, 300] as const;
+
 function AppShell() {
   const {
-    setActiveSurface,
-    setActivePanel,
-    cycleSelectedRecord,
-    markRefreshed,
     state,
+    selectRecord,
+    setAutoRefresh,
+    setIntervalSeconds,
+    setActivePanel,
   } = useRunProbeShell();
+  const selectedRecordId = state.preferences.selectedRecordId;
+  const firstRecordId = state.records[0]?.id ?? null;
+  const autoRefresh = state.preferences.autoRefresh;
+  const intervalSeconds = state.preferences.intervalSeconds;
   const activeSurfaceId = state.preferences.activeSurfaceId;
   const activePanel = state.preferences.activePanel;
   const lastError = state.lastError;
   const lastRefreshedAt = state.preferences.lastRefreshedAt;
   const refreshTick = state.refreshTick;
-  const hasRecords = state.records.length > 0;
 
   const handleRefreshAction = useCallback(() => {
-    markRefreshed();
-  }, [markRefreshed]);
+    selectRecord(null);
+  }, [selectRecord]);
 
   const handleManualRefreshAction = useCallback(() => {
-    if (!hasRecords) {
-      markRefreshed();
-      return;
-    }
-    cycleSelectedRecord();
-  }, [cycleSelectedRecord, markRefreshed, hasRecords]);
+    const next = selectedRecordId ?? firstRecordId;
+    selectRecord(next);
+  }, [selectedRecordId, firstRecordId, selectRecord]);
 
   const handleSettingsAction = useCallback(() => {
-    setActiveSurface("SURF_SETTINGS");
+    setAutoRefresh(!autoRefresh);
     setActivePanel("settings");
-  }, [setActiveSurface, setActivePanel]);
+  }, [setAutoRefresh, setActivePanel, autoRefresh]);
 
   const handleDocumentationLink = useCallback(() => {
-    setActiveSurface("SURF_DOCUMENTATION");
+    const currentIndex = INTERVAL_OPTIONS_SECONDS.indexOf(
+      intervalSeconds as (typeof INTERVAL_OPTIONS_SECONDS)[number],
+    );
+    const nextValue =
+      INTERVAL_OPTIONS_SECONDS[
+        currentIndex === -1 ? 0 : (currentIndex + 1) % INTERVAL_OPTIONS_SECONDS.length
+      ];
+    setIntervalSeconds(nextValue);
     setActivePanel("documentation");
-  }, [setActiveSurface, setActivePanel]);
+  }, [setIntervalSeconds, setActivePanel, intervalSeconds]);
 
   const handlePrivacyLink = useCallback(() => {
-    setActiveSurface("SURF_PRIVACY");
+    const nextRecord = state.records[0]?.id ?? null;
+    selectRecord(nextRecord);
     setActivePanel("privacy");
-  }, [setActiveSurface, setActivePanel]);
+  }, [selectRecord, setActivePanel, state.records]);
 
   const screenActions = useMemo(
     () => ({
