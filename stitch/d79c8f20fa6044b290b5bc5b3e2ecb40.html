@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Run Probe Utility</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-dim": "#d8dadc",
+                        "on-secondary-container": "#54647a",
+                        "on-surface-variant": "#45464d",
+                        "inverse-primary": "#bec6e0",
+                        "background": "#f7f9fb",
+                        "on-tertiary": "#ffffff",
+                        "on-tertiary-fixed-variant": "#574425",
+                        "surface-container-low": "#f2f4f6",
+                        "secondary": "#505f76",
+                        "inverse-on-surface": "#eff1f3",
+                        "secondary-fixed-dim": "#b7c8e1",
+                        "on-tertiary-fixed": "#271901",
+                        "on-background": "#191c1e",
+                        "outline-variant": "#c6c6cd",
+                        "on-primary-container": "#7c839b",
+                        "surface-container": "#eceef0",
+                        "secondary-container": "#d0e1fb",
+                        "tertiary-fixed": "#fcdeb5",
+                        "surface-container-highest": "#e0e3e5",
+                        "tertiary-fixed-dim": "#dec29a",
+                        "on-secondary-fixed-variant": "#38485d",
+                        "tertiary": "#000000",
+                        "on-surface": "#191c1e",
+                        "error": "#ba1a1a",
+                        "surface-container-lowest": "#ffffff",
+                        "primary-fixed": "#dae2fd",
+                        "surface-bright": "#f7f9fb",
+                        "surface-container-high": "#e6e8ea",
+                        "surface": "#f7f9fb",
+                        "secondary-fixed": "#d3e4fe",
+                        "surface-tint": "#565e74",
+                        "error-container": "#ffdad6",
+                        "on-error-container": "#93000a",
+                        "primary": "#000000",
+                        "on-primary-fixed": "#131b2e",
+                        "on-secondary": "#ffffff",
+                        "surface-variant": "#e0e3e5",
+                        "primary-container": "#131b2e",
+                        "on-secondary-fixed": "#0b1c30",
+                        "primary-fixed-dim": "#bec6e0",
+                        "on-error": "#ffffff",
+                        "on-tertiary-container": "#98805d",
+                        "inverse-surface": "#2d3133",
+                        "on-primary": "#ffffff",
+                        "outline": "#76777d",
+                        "tertiary-container": "#271901",
+                        "on-primary-fixed-variant": "#3f465c"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "xl": "24px",
+                        "gutter": "16px",
+                        "lg": "16px",
+                        "margin-desktop": "32px",
+                        "md": "12px",
+                        "margin-mobile": "16px",
+                        "xs": "4px",
+                        "sm": "8px",
+                        "unit": "4px"
+                    },
+                    "fontFamily": {
+                        "body-md": ["Inter"],
+                        "body-sm": ["Inter"],
+                        "label-sm": ["Inter"],
+                        "label-md": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "code-md": ["JetBrains Mono"]
+                    },
+                    "fontSize": {
+                        "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "body-sm": ["13px", { "lineHeight": "18px", "fontWeight": "400" }],
+                        "label-sm": ["11px", { "lineHeight": "14px", "fontWeight": "500" }],
+                        "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "600" }],
+                        "headline-lg": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+                        "headline-md": ["18px", { "lineHeight": "24px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "code-md": ["13px", { "lineHeight": "20px", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body {
+            background-color: theme('colors.background');
+            color: theme('colors.on-background');
+        }
+        .recessed-input {
+            box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05);
+        }
+        .status-ready {
+            background-color: rgba(34, 197, 94, 0.1);
+            color: #16a34a;
+        }
+        .status-paused {
+            background-color: rgba(234, 179, 8, 0.1);
+            color: #ca8a04;
+        }
+        .status-error {
+            background-color: rgba(239, 68, 68, 0.1);
+            color: #dc2626;
+        }
+        /* Custom scrollbar for a tighter feel */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: theme('colors.surface-container-low'); 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: theme('colors.outline-variant'); 
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: theme('colors.outline'); 
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col font-body-md antialiased selection:bg-primary-container selection:text-on-primary-container">
+<!-- TopAppBar -->
+<header class="bg-surface dark:bg-background border-b border-outline-variant dark:border-outline docked full-width top-0 z-50">
+<div class="flex justify-between items-center h-14 px-gutter w-full max-w-7xl mx-auto">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-primary dark:text-primary-fixed" data-icon="terminal" data-weight="fill" style="font-variation-settings: 'FILL' 1;">terminal</span>
+<span class="text-headline-md font-headline-md font-bold text-primary dark:text-primary-fixed">Run Probe</span>
+</div>
+<div class="flex items-center gap-sm">
+<button aria-label="refresh" class="p-xs rounded text-on-surface-variant dark:text-on-surface-variant hover:bg-surface-container dark:hover:bg-surface-container-high transition-colors">
+<span class="material-symbols-outlined text-[20px]" data-icon="refresh">refresh</span>
+</button>
+<button aria-label="settings" class="p-xs rounded text-on-surface-variant dark:text-on-surface-variant hover:bg-surface-container dark:hover:bg-surface-container-high transition-colors">
+<span class="material-symbols-outlined text-[20px]" data-icon="settings">settings</span>
+</button>
+</div>
+</div>
+</header>
+<!-- Main Content Area -->
+<main class="flex-grow flex items-center justify-center p-gutter lg:p-margin-desktop">
+<!-- Utility Card Container -->
+<div class="w-full max-w-md bg-surface-container-lowest border border-outline-variant rounded shadow-[0_1px_3px_0_rgba(0,0,0,0.1),0_1px_2px_-1px_rgba(0,0,0,0.1)] flex flex-col">
+<!-- Card Header -->
+<div class="p-md border-b border-outline-variant flex justify-between items-center bg-surface-container-low rounded-t">
+<div>
+<h1 class="font-headline-md text-headline-md text-on-surface">System Status</h1>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-xs">Local diagnostics and readiness.</p>
+</div>
+<!-- System State Toggle -->
+<div class="flex items-center gap-sm">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">State</span>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" id="system-state-toggle" type="checkbox" value=""/>
+<div class="w-9 h-5 bg-outline-variant peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary"></div>
+</label>
+</div>
+</div>
+<!-- Error Banner (Optional/Hidden by default, shown here for demonstration) -->
+<div class="bg-error-container border-b border-error/20 p-sm px-md flex items-start gap-sm" id="error-banner" style="display: none;">
+<span class="material-symbols-outlined text-on-error-container text-[18px] mt-0.5" data-icon="error" data-weight="fill" style="font-variation-settings: 'FILL' 1;">error</span>
+<div class="flex-1">
+<p class="font-body-sm text-body-sm text-on-error-container font-medium">Local state synchronization failed.</p>
+<p class="font-body-sm text-body-sm text-on-error-container opacity-80 text-[11px] leading-tight mt-0.5">Attempting automatic retry in 30s...</p>
+</div>
+</div>
+<!-- Status Metrics Grid -->
+<div class="p-md flex flex-col gap-sm bg-surface-container-lowest">
+<!-- Metric 1: Connectivity -->
+<div class="flex items-center justify-between p-sm border border-outline-variant rounded bg-surface">
+<div class="flex items-center gap-md">
+<div class="w-8 h-8 rounded bg-surface-container flex items-center justify-center border border-outline-variant">
+<span class="material-symbols-outlined text-on-surface-variant text-[18px]" data-icon="router">router</span>
+</div>
+<div>
+<p class="font-label-md text-label-md text-on-surface">Probe Connectivity</p>
+<p class="font-code-md text-code-md text-on-surface-variant text-[11px]">ws://localhost:8080/probe</p>
+</div>
+</div>
+<div class="status-ready px-2 py-1 rounded flex items-center gap-1 border border-green-200/50">
+<div class="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></div>
+<span class="font-label-sm text-label-sm font-semibold tracking-wide">CONNECTED</span>
+</div>
+</div>
+<!-- Metric 2: Storage -->
+<div class="flex items-center justify-between p-sm border border-outline-variant rounded bg-surface">
+<div class="flex items-center gap-md">
+<div class="w-8 h-8 rounded bg-surface-container flex items-center justify-center border border-outline-variant">
+<span class="material-symbols-outlined text-on-surface-variant text-[18px]" data-icon="database">database</span>
+</div>
+<div>
+<p class="font-label-md text-label-md text-on-surface">Local Storage</p>
+<p class="font-code-md text-code-md text-on-surface-variant text-[11px]">LevelDB / Vol: /data</p>
+</div>
+</div>
+<div class="status-ready px-2 py-1 rounded flex items-center gap-1 border border-green-200/50">
+<div class="w-1.5 h-1.5 rounded-full bg-green-500"></div>
+<span class="font-label-sm text-label-sm font-semibold tracking-wide">SYNCED</span>
+</div>
+</div>
+<!-- Metric 3: Agent Readiness -->
+<div class="flex items-center justify-between p-sm border border-outline-variant rounded bg-surface">
+<div class="flex items-center gap-md">
+<div class="w-8 h-8 rounded bg-surface-container flex items-center justify-center border border-outline-variant">
+<span class="material-symbols-outlined text-on-surface-variant text-[18px]" data-icon="memory">memory</span>
+</div>
+<div>
+<p class="font-label-md text-label-md text-on-surface">Agent Readiness</p>
+<p class="font-code-md text-code-md text-on-surface-variant text-[11px]">Model: qwen-2.5-coder</p>
+</div>
+</div>
+<!-- Example of a paused/warning state -->
+<div class="status-paused px-2 py-1 rounded flex items-center gap-1 border border-yellow-200/50" id="agent-status">
+<div class="w-1.5 h-1.5 rounded-full bg-yellow-500"></div>
+<span class="font-label-sm text-label-sm font-semibold tracking-wide">IDLE</span>
+</div>
+</div>
+</div>
+<!-- Action Area -->
+<div class="p-md bg-surface-container-low border-t border-outline-variant flex items-center justify-between rounded-b">
+<div class="flex items-center gap-xs text-on-surface-variant">
+<span class="material-symbols-outlined text-[14px]" data-icon="update">update</span>
+<span class="font-body-sm text-body-sm text-[12px]" id="last-checked">Last checked: <span class="font-code-md text-[11px]">Oct 24, 14:32:01</span></span>
+</div>
+<button class="bg-primary text-on-primary font-label-md text-label-md px-4 py-2 rounded hover:bg-primary/90 transition-colors flex items-center gap-sm active:scale-95 transform duration-100" id="manual-refresh-btn">
+<span class="material-symbols-outlined text-[16px]" data-icon="sync">sync</span>
+                    Manual Refresh
+                </button>
+</div>
+</div>
+</main>
+<!-- Footer -->
+<footer class="bg-surface-container-lowest dark:bg-surface-container-lowest border-t border-outline-variant dark:border-outline full-width bottom-0 mt-auto">
+<div class="flex flex-col md:flex-row justify-between items-center py-sm px-gutter w-full max-w-7xl mx-auto">
+<div class="flex items-center gap-sm">
+<span class="font-headline-md text-headline-md text-primary" style="font-size: 14px;">Run Probe</span>
+<span class="text-on-surface-variant dark:text-on-secondary-container font-body-sm text-body-sm text-[11px]">© 2024 Run Probe Utility</span>
+</div>
+<div class="flex gap-md mt-2 md:mt-0">
+<a class="text-on-surface-variant dark:text-on-secondary-container font-label-md text-label-md hover:text-primary dark:hover:text-primary-fixed transition-colors duration-200" href="#">Documentation</a>
+<a class="text-on-surface-variant dark:text-on-secondary-container font-label-md text-label-md hover:text-primary dark:hover:text-primary-fixed transition-colors duration-200" href="#">Privacy</a>
+</div>
+</div>
+</footer>
+<script>
+        // Simple interactions script
+        document.addEventListener('DOMContentLoaded', () => {
+            const refreshBtn = document.getElementById('manual-refresh-btn');
+            const lastCheckedText = document.getElementById('last-checked');
+            const syncIcon = refreshBtn.querySelector('.material-symbols-outlined');
+            const toggleBtn = document.getElementById('system-state-toggle');
+            const agentStatus = document.getElementById('agent-status');
+            const errorBanner = document.getElementById('error-banner');
+
+            // Format date for logging
+            const formatDate = (date) => {
+                const options = { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false };
+                return date.toLocaleString('en-US', options).replace(',', '');
+            };
+
+            // Refresh action
+            refreshBtn.addEventListener('click', () => {
+                // Animate icon
+                syncIcon.classList.add('animate-spin');
+                refreshBtn.classList.add('opacity-80', 'cursor-not-allowed');
+                
+                // Simulate network request
+                setTimeout(() => {
+                    syncIcon.classList.remove('animate-spin');
+                    refreshBtn.classList.remove('opacity-80', 'cursor-not-allowed');
+                    
+                    const now = new Date();
+                    lastCheckedText.innerHTML = `Last checked: <span class="font-code-md text-[11px]">Just now</span>`;
+                    
+                    // Reset text after a few seconds to absolute time
+                    setTimeout(() => {
+                        lastCheckedText.innerHTML = `Last checked: <span class="font-code-md text-[11px]">${formatDate(now)}</span>`;
+                    }, 5000);
+
+                    // Randomly show error banner to demonstrate state
+                    if(Math.random() > 0.8) {
+                        errorBanner.style.display = 'flex';
+                        setTimeout(() => { errorBanner.style.display = 'none'; }, 4000);
+                    }
+
+                }, 800);
+            });
+
+            // Toggle action
+            toggleBtn.addEventListener('change', (e) => {
+                if(e.target.checked) {
+                    agentStatus.className = 'status-ready px-2 py-1 rounded flex items-center gap-1 border border-green-200/50';
+                    agentStatus.innerHTML = `<div class="w-1.5 h-1.5 rounded-full bg-green-500"></div><span class="font-label-sm text-label-sm font-semibold tracking-wide">ACTIVE</span>`;
+                } else {
+                    agentStatus.className = 'status-paused px-2 py-1 rounded flex items-center gap-1 border border-yellow-200/50';
+                    agentStatus.innerHTML = `<div class="w-1.5 h-1.5 rounded-full bg-yellow-500"></div><span class="font-label-sm text-label-sm font-semibold tracking-wide">PAUSED</span>`;
+                }
+            });
+        });
+    </script>
+</body></html>

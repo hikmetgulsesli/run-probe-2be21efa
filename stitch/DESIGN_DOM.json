@@ -1,0 +1,323 @@
+{
+  "generatedAt": "2026-07-01T09:52:14.213Z",
+  "screenCount": 1,
+  "screens": {
+    "d79c8f20fa6044b290b5bc5b3e2ecb40": {
+      "screenId": "d79c8f20fa6044b290b5bc5b3e2ecb40",
+      "materialSymbolsRequired": true,
+      "sections": [
+        {
+          "tag": "header",
+          "layout": "block",
+          "classes": [
+            "bg-surface",
+            "dark:bg-background",
+            "border-b",
+            "border-outline-variant",
+            "dark:border-outline",
+            "docked",
+            "full-width",
+            "top-0",
+            "z-50"
+          ],
+          "childCount": 3
+        },
+        {
+          "tag": "main",
+          "layout": "flex-row",
+          "classes": [
+            "flex-grow",
+            "flex",
+            "items-center",
+            "justify-center",
+            "p-gutter",
+            "lg:p-margin-desktop"
+          ],
+          "childCount": 28
+        },
+        {
+          "tag": "footer",
+          "layout": "block",
+          "classes": [
+            "bg-surface-container-lowest",
+            "dark:bg-surface-container-lowest",
+            "border-t",
+            "border-outline-variant",
+            "dark:border-outline",
+            "full-width",
+            "bottom-0",
+            "mt-auto"
+          ],
+          "childCount": 3
+        }
+      ],
+      "buttons": [
+        {
+          "kind": "button",
+          "label": "refresh",
+          "classes": [
+            "p-xs",
+            "rounded",
+            "text-on-surface-variant",
+            "dark:text-on-surface-variant",
+            "hover:bg-surface-container",
+            "dark:hover:bg-surface-container-high",
+            "transition-colors"
+          ],
+          "icon": "refresh",
+          "action": "click-action",
+          "expectedBehavior": "produce visible DOM/state/URL feedback; never empty onClick"
+        },
+        {
+          "kind": "button",
+          "label": "settings",
+          "classes": [
+            "p-xs",
+            "rounded",
+            "text-on-surface-variant",
+            "dark:text-on-surface-variant",
+            "hover:bg-surface-container",
+            "dark:hover:bg-surface-container-high",
+            "transition-colors"
+          ],
+          "icon": "settings",
+          "action": "navigate",
+          "expectedBehavior": "navigate:/settings",
+          "expectedRoute": "/settings",
+          "routeInferred": true
+        },
+        {
+          "kind": "button",
+          "label": "Manual Refresh",
+          "classes": [
+            "bg-primary",
+            "text-on-primary",
+            "font-label-md",
+            "text-label-md",
+            "px-4",
+            "py-2",
+            "rounded",
+            "hover:bg-primary/90",
+            "transition-colors",
+            "flex",
+            "items-center",
+            "gap-sm",
+            "active:scale-95",
+            "transform",
+            "duration-100"
+          ],
+          "icon": "sync",
+          "action": "click-action",
+          "expectedBehavior": "produce visible DOM/state/URL feedback; never empty onClick"
+        },
+        {
+          "kind": "button",
+          "label": "Run Probe © 2024 Run Probe Utility",
+          "classes": [],
+          "icon": null,
+          "action": "click-action",
+          "expectedBehavior": "produce visible DOM/state/URL feedback; never empty onClick"
+        }
+      ],
+      "inputs": [
+        {
+          "kind": "input",
+          "type": "checkbox",
+          "label": "system-state-toggle",
+          "placeholder": "",
+          "name": "system-state-toggle",
+          "classes": [
+            "sr-only",
+            "peer"
+          ],
+          "expectedBehavior": "controlled value with onChange; validation if required by PRD"
+        }
+      ],
+      "navLinks": [
+        {
+          "kind": "link",
+          "label": "Documentation",
+          "href": "#",
+          "classes": [
+            "text-on-surface-variant",
+            "dark:text-on-secondary-container",
+            "font-label-md",
+            "text-label-md",
+            "hover:text-primary",
+            "dark:hover:text-primary-fixed",
+            "transition-colors",
+            "duration-200"
+          ],
+          "icon": null,
+          "action": "navigate",
+          "expectedBehavior": "navigate:#"
+        },
+        {
+          "kind": "link",
+          "label": "Privacy",
+          "href": "#",
+          "classes": [
+            "text-on-surface-variant",
+            "dark:text-on-secondary-container",
+            "font-label-md",
+            "text-label-md",
+            "hover:text-primary",
+            "dark:hover:text-primary-fixed",
+            "transition-colors",
+            "duration-200"
+          ],
+          "icon": null,
+          "action": "navigate",
+          "expectedBehavior": "navigate:#"
+        }
+      ],
+      "cards": [],
+      "icons": [
+        "terminal",
+        "refresh",
+        "settings",
+        "error",
+        "router",
+        "database",
+        "memory",
+        "update",
+        "sync"
+      ],
+      "images": [],
+      "cssVars": {},
+      "colorPalette": {
+        "surface-dim": "#d8dadc",
+        "on-secondary-container": "#54647a",
+        "on-surface-variant": "#45464d",
+        "inverse-primary": "#bec6e0",
+        "background": "#f7f9fb",
+        "on-tertiary": "#ffffff",
+        "on-tertiary-fixed-variant": "#574425",
+        "surface-container-low": "#f2f4f6",
+        "secondary": "#505f76",
+        "inverse-on-surface": "#eff1f3",
+        "secondary-fixed-dim": "#b7c8e1",
+        "on-tertiary-fixed": "#271901",
+        "on-background": "#191c1e",
+        "outline-variant": "#c6c6cd",
+        "on-primary-container": "#7c839b",
+        "surface-container": "#eceef0",
+        "secondary-container": "#d0e1fb",
+        "tertiary-fixed": "#fcdeb5",
+        "surface-container-highest": "#e0e3e5",
+        "tertiary-fixed-dim": "#dec29a",
+        "on-secondary-fixed-variant": "#38485d",
+        "tertiary": "#000000",
+        "on-surface": "#191c1e",
+        "error": "#ba1a1a",
+        "surface-container-lowest": "#ffffff",
+        "primary-fixed": "#dae2fd",
+        "surface-bright": "#f7f9fb",
+        "surface-container-high": "#e6e8ea",
+        "surface": "#f7f9fb",
+        "secondary-fixed": "#d3e4fe",
+        "surface-tint": "#565e74",
+        "error-container": "#ffdad6",
+        "on-error-container": "#93000a",
+        "primary": "#000000",
+        "on-primary-fixed": "#131b2e",
+        "on-secondary": "#ffffff",
+        "surface-variant": "#e0e3e5",
+        "primary-container": "#131b2e",
+        "on-secondary-fixed": "#0b1c30",
+        "primary-fixed-dim": "#bec6e0",
+        "on-error": "#ffffff",
+        "on-tertiary-container": "#98805d",
+        "inverse-surface": "#2d3133",
+        "on-primary": "#ffffff",
+        "outline": "#76777d",
+        "tertiary-container": "#271901",
+        "on-primary-fixed-variant": "#3f465c"
+      },
+      "fonts": [
+        "Material Symbols Outlined",
+        "Inter",
+        "JetBrains Mono"
+      ],
+      "layoutHints": {
+        "flexDirection": "col",
+        "gap": "1"
+      },
+      "behaviorContract": [
+        {
+          "kind": "link",
+          "label": "Documentation",
+          "icon": null,
+          "route": "#",
+          "expectedBehavior": "navigate:#"
+        },
+        {
+          "kind": "link",
+          "label": "Privacy",
+          "icon": null,
+          "route": "#",
+          "expectedBehavior": "navigate:#"
+        },
+        {
+          "kind": "button",
+          "label": "refresh",
+          "icon": "refresh",
+          "action": "click-action",
+          "expectedBehavior": "produce visible DOM/state/URL feedback; never empty onClick"
+        },
+        {
+          "kind": "button",
+          "label": "settings",
+          "icon": "settings",
+          "action": "navigate",
+          "route": "/settings",
+          "expectedBehavior": "navigate:/settings"
+        },
+        {
+          "kind": "button",
+          "label": "Manual Refresh",
+          "icon": "sync",
+          "action": "click-action",
+          "expectedBehavior": "produce visible DOM/state/URL feedback; never empty onClick"
+        },
+        {
+          "kind": "button",
+          "label": "Run Probe © 2024 Run Probe Utility",
+          "icon": null,
+          "action": "click-action",
+          "expectedBehavior": "produce visible DOM/state/URL feedback; never empty onClick"
+        },
+        {
+          "kind": "input",
+          "label": "system-state-toggle",
+          "type": "checkbox",
+          "placeholder": "",
+          "expectedBehavior": "controlled value with onChange; validation if required by PRD"
+        }
+      ],
+      "tabBar": [
+        {
+          "kind": "button",
+          "label": "Run Probe © 2024 Run Probe Utility",
+          "icon": null,
+          "active": true
+        },
+        {
+          "kind": "link",
+          "label": "Documentation",
+          "icon": null,
+          "route": "#",
+          "active": true
+        },
+        {
+          "kind": "link",
+          "label": "Privacy",
+          "icon": null,
+          "route": "#",
+          "active": true
+        }
+      ],
+      "title": "Status Utility - Run Probe"
+    }
+  }
+}
