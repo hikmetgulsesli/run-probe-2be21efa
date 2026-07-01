@@ -1,0 +1,85 @@
+[
+  {
+    "screenId": "d79c8f20fa6044b290b5bc5b3e2ecb40",
+    "screenTitle": "Status Utility - Run Probe",
+    "deviceType": "DESKTOP",
+    "elements": [
+      {
+        "type": "link",
+        "label": "Documentation",
+        "href": "#",
+        "line": 261
+      },
+      {
+        "type": "link",
+        "label": "Privacy",
+        "href": "#",
+        "line": 262
+      },
+      {
+        "type": "button",
+        "label": "refresh",
+        "line": 152
+      },
+      {
+        "type": "button",
+        "label": "settings",
+        "line": 155
+      },
+      {
+        "type": "button",
+        "label": "Manual Refresh",
+        "line": 246
+      },
+      {
+        "type": "input",
+        "label": "checkbox",
+        "inputType": "checkbox",
+        "line": 175
+      }
+    ],
+    "navigation": [
+      {
+        "type": "link",
+        "label": "Documentation",
+        "href": "#",
+        "line": 261
+      },
+      {
+        "type": "link",
+        "label": "Privacy",
+        "href": "#",
+        "line": 262
+      }
+    ],
+    "buttons": [
+      {
+        "type": "button",
+        "label": "refresh",
+        "line": 152
+      },
+      {
+        "type": "button",
+        "label": "settings",
+        "line": 155
+      },
+      {
+        "type": "button",
+        "label": "Manual Refresh",
+        "line": 246
+      }
+    ],
+    "inputs": [
+      {
+        "type": "input",
+        "label": "checkbox",
+        "inputType": "checkbox",
+        "line": 175
+      }
+    ],
+    "hardcodedData": [],
+    "totalInteractive": 6,
+    "requiresRouter": false,
+    "requiresDragDrop": false
+  }
+]
