@@ -6,6 +6,7 @@ export interface ActRefreshStatusOptions {
   shell?: Pick<RunProbeShellApi, "markRefreshed" | "selectRecord">;
   markRefreshed?: () => void;
   selectRecord?: (recordId: string | null) => void;
+  currentRefreshTick?: number;
 }
 
 export interface ActRefreshStatusResult {
@@ -24,12 +25,13 @@ export function actRefreshStatus(
   fallbackRecordId: string | null = null,
   options: ActRefreshStatusOptions = {},
 ): ActRefreshStatusResult {
+  const shell = options.shell;
   const doMarkRefreshed =
     options.markRefreshed ??
-    (options.shell ? () => options.shell?.markRefreshed() : FALLBACK_MARK_REFRESHED);
+    (shell ? () => shell.markRefreshed?.() : FALLBACK_MARK_REFRESHED);
   const doSelectRecord =
     options.selectRecord ??
-    (options.shell ? (id) => options.shell?.selectRecord(id) : FALLBACK_SELECT_RECORD);
+    (shell ? (id) => shell.selectRecord?.(id) : FALLBACK_SELECT_RECORD);
 
   const nextSelected = currentSelectedRecordId ?? fallbackRecordId;
   if (nextSelected !== currentSelectedRecordId) {
@@ -38,8 +40,9 @@ export function actRefreshStatus(
   doMarkRefreshed();
 
   const now = Date.now();
+  const nextTick = (options.currentRefreshTick ?? 0) + 1;
   return {
-    refreshTick: now,
+    refreshTick: nextTick,
     lastRefreshedAt: now,
     selectedRecordId: nextSelected,
     activeSurfaceId: "SURF_STATUS_UTILITY",

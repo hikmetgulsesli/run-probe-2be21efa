@@ -7,11 +7,17 @@
 // 3. Wire interactive controls through the typed actions prop
 // 4. Replace placeholder data with props/state
 
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { CircleAlert, Cpu, Database, RefreshCw, Router, Settings, Terminal } from "lucide-react";
 
 
-export type StatusUtilityRunProbeActionId = "refresh-1" | "settings-2" | "manual-refresh-3" | "documentation-1" | "privacy-2";
+export type StatusUtilityRunProbeActionId =
+  | "refresh-1"
+  | "settings-2"
+  | "manual-refresh-3"
+  | "documentation-1"
+  | "privacy-2"
+  | "system-state-toggle";
 
 export interface StatusUtilityRunProbeProps {
   actions?: Partial<Record<StatusUtilityRunProbeActionId, () => void>>;
@@ -20,8 +26,9 @@ export interface StatusUtilityRunProbeProps {
 }
 
 function formatTimestamp(at: number | null | undefined): string {
-  if (typeof at !== "number") return "—";
+  if (typeof at !== "number" || !Number.isFinite(at)) return "—";
   const d = new Date(at);
+  if (Number.isNaN(d.getTime())) return "—";
   const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
   const month = months[d.getMonth()] ?? "Jan";
   const day = String(d.getDate()).padStart(2, "0");
@@ -32,13 +39,22 @@ function formatTimestamp(at: number | null | undefined): string {
 }
 
 export function StatusUtilityRunProbe({ actions, lastRefreshedAt, autoRefresh }: StatusUtilityRunProbeProps) {
-  const [systemEnabled, setSystemEnabled] = useState<boolean>(autoRefresh ?? true);
+  const resolvedAutoRefresh = autoRefresh ?? true;
+  const [systemEnabled, setSystemEnabled] = useState<boolean>(resolvedAutoRefresh);
   const [footerClickCount, setFooterClickCount] = useState<number>(0);
   const [footerPulse, setFooterPulse] = useState<number>(0);
 
+  useEffect(() => {
+    setSystemEnabled(resolvedAutoRefresh);
+  }, [resolvedAutoRefresh]);
+
   const handleSystemToggle = useCallback(() => {
-    setSystemEnabled((prev) => !prev);
-  }, []);
+    setSystemEnabled((prev) => {
+      const next = !prev;
+      actions?.["system-state-toggle"]?.();
+      return next;
+    });
+  }, [actions]);
 
   const handleFooterClick = useCallback(() => {
     setFooterClickCount((c) => c + 1);

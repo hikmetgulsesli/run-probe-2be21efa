@@ -43,6 +43,7 @@ function AppShell() {
     actRefreshStatus(currentSelected, fallback, {
       markRefreshed: () => markRefreshed(),
       selectRecord: (id) => selectRecord(id),
+      currentRefreshTick: stateRef.current.refreshTick,
     });
   }, [markRefreshed, selectRecord]);
 
@@ -52,6 +53,7 @@ function AppShell() {
     actRefreshStatus(current, fallback, {
       markRefreshed: () => markRefreshed(),
       selectRecord: (id) => selectRecord(id),
+      currentRefreshTick: stateRef.current.refreshTick,
     });
   }, [markRefreshed, selectRecord]);
 
@@ -81,6 +83,12 @@ function AppShell() {
     setActivePanel("privacy");
   }, [selectRecord, setActivePanel]);
 
+  const handleSystemStateToggleAction = useCallback(() => {
+    actToggleStatus(stateRef.current.preferences.autoRefresh, {
+      setAutoRefresh: (enabled) => setAutoRefresh(enabled),
+    });
+  }, [setAutoRefresh]);
+
   const screenActions = useMemo(
     () => ({
       "refresh-1": handleRefreshAction,
@@ -88,6 +96,7 @@ function AppShell() {
       "manual-refresh-3": handleManualRefreshAction,
       "documentation-1": handleDocumentationLink,
       "privacy-2": handlePrivacyLink,
+      "system-state-toggle": handleSystemStateToggleAction,
     }),
     [
       handleRefreshAction,
@@ -95,6 +104,7 @@ function AppShell() {
       handleManualRefreshAction,
       handleDocumentationLink,
       handlePrivacyLink,
+      handleSystemStateToggleAction,
     ],
   );
 

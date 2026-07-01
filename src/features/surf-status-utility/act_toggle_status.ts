@@ -21,10 +21,11 @@ export function actToggleStatus(
   currentAutoRefresh: boolean,
   options: ActToggleStatusOptions = {},
 ): ActToggleStatusResult {
+  const shell = options.shell;
   const doSetAutoRefresh =
     options.setAutoRefresh ??
-    (options.shell
-      ? (enabled: boolean) => options.shell?.setAutoRefresh(enabled)
+    (shell
+      ? (enabled: boolean) => shell.setAutoRefresh?.(enabled)
       : FALLBACK_SET_AUTO_REFRESH);
   const previousState: SystemState = currentAutoRefresh ? "ready" : "paused";
   const nextState: SystemState = currentAutoRefresh ? "paused" : "ready";
