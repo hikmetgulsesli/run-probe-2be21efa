@@ -23,6 +23,7 @@ function AppShell() {
     setAutoRefresh,
     setIntervalSeconds,
     setActivePanel,
+    markRefreshed,
   } = useRunProbeShell();
   const activeSurfaceId = state.preferences.activeSurfaceId;
   const activePanel = state.preferences.activePanel;
@@ -35,13 +36,15 @@ function AppShell() {
 
   const handleRefreshAction = useCallback(() => {
     selectRecord(null);
-  }, [selectRecord]);
+    markRefreshed();
+  }, [selectRecord, markRefreshed]);
 
   const handleManualRefreshAction = useCallback(() => {
     const current = stateRef.current.preferences.selectedRecordId;
     const fallback = stateRef.current.records[0]?.id ?? null;
     selectRecord(current ?? fallback);
-  }, [selectRecord]);
+    markRefreshed();
+  }, [selectRecord, markRefreshed]);
 
   const handleSettingsAction = useCallback(() => {
     setAutoRefresh(!stateRef.current.preferences.autoRefresh);
@@ -67,6 +70,10 @@ function AppShell() {
     setActivePanel("privacy");
   }, [selectRecord, setActivePanel]);
 
+  const handleSystemStateToggleAction = useCallback(() => {
+    setAutoRefresh(!stateRef.current.preferences.autoRefresh);
+  }, [setAutoRefresh]);
+
   const screenActions = useMemo(
     () => ({
       "refresh-1": handleRefreshAction,
@@ -74,6 +81,7 @@ function AppShell() {
       "manual-refresh-3": handleManualRefreshAction,
       "documentation-1": handleDocumentationLink,
       "privacy-2": handlePrivacyLink,
+      "system-state-toggle": handleSystemStateToggleAction,
     }),
     [
       handleRefreshAction,
@@ -81,6 +89,7 @@ function AppShell() {
       handleManualRefreshAction,
       handleDocumentationLink,
       handlePrivacyLink,
+      handleSystemStateToggleAction,
     ],
   );
 
