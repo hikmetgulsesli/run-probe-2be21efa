@@ -1,0 +1,45 @@
+[
+  {
+    "screenId": "d79c8f20fa6044b290b5bc5b3e2ecb40",
+    "title": "Status Utility - Run Probe",
+    "componentName": "StatusUtilityRunProbe",
+    "file": "src/screens/StatusUtilityRunProbe.tsx",
+    "buttons": 3,
+    "inputs": 1,
+    "links": 2,
+    "actions": [
+      {
+        "id": "refresh-1",
+        "kind": "button",
+        "label": "refresh",
+        "index": 0
+      },
+      {
+        "id": "settings-2",
+        "kind": "button",
+        "label": "settings",
+        "index": 1
+      },
+      {
+        "id": "manual-refresh-3",
+        "kind": "button",
+        "label": "Manual Refresh",
+        "index": 2
+      },
+      {
+        "id": "documentation-1",
+        "kind": "link",
+        "label": "Documentation",
+        "href": "#",
+        "index": 0
+      },
+      {
+        "id": "privacy-2",
+        "kind": "link",
+        "label": "Privacy",
+        "href": "#",
+        "index": 1
+      }
+    ]
+  }
+]
